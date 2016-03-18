@@ -31,7 +31,7 @@ include_once DOL_DOCUMENT_ROOT .'/core/modules/DolibarrModules.class.php';
 /**
  *  Description and activation class for module planformation
  */
-class modplanformation extends DolibarrModules
+class modPlanFormation extends DolibarrModules
 {
 	/**
 	 *   Constructor. Define names, constants, directories, boxes, permissions
@@ -87,7 +87,7 @@ class modplanformation extends DolibarrModules
 		//							'dir' => array('output' => 'othermodulename'),      // To force the default directories names
 		//							'workflow' => array('WORKFLOW_MODULE1_YOURACTIONTYPE_MODULE2'=>array('enabled'=>'! empty($conf->module1->enabled) && ! empty($conf->module2->enabled)', 'picto'=>'yourpicto@planformation')) // Set here all workflow context managed by module
 		//                        );
-		$this->module_parts = array();
+		$this->module_parts = array('models' => 1);
 
 		// Data directories to create when module is enabled.
 		// Example: this->dirs = array("/planformation/temp");
@@ -110,7 +110,25 @@ class modplanformation extends DolibarrModules
 		// Example: $this->const=array(0=>array('MYMODULE_MYNEWCONST1','chaine','myvalue','This is a constant to add',1),
 		//                             1=>array('MYMODULE_MYNEWCONST2','chaine','myvalue','This is another constant to add',0, 'current', 1)
 		// );
-		$this->const = array();
+		$this->const = array ();
+		$this->const[] = array (
+				'PF_ADDON',
+				'chaine',
+				'mod_planformation_simple',
+				'Numbering planformation rule',
+				0,
+				'current',
+				1
+		);
+		$this->const[] = array (
+				'PF_UNIVERSAL_MASK',
+				'chaine',
+				'',
+				'Numbering planformation rule',
+				0,
+				'current',
+				1
+		);
 
 		// Array to add new pages in new tabs
 		// Example: $this->tabs = array('objecttype:+tabname1:Title1:mylangfile@planformation:$user->rights->planformation->read:/planformation/mynewtab1.php?id=__ID__',  	// To add a new tab identified by code tabname1
@@ -147,9 +165,11 @@ class modplanformation extends DolibarrModules
 		$this->dictionaries=array();
         /* Example:
         if (! isset($conf->planformation->enabled)) $conf->planformation->enabled=0;	// This is to avoid warnings
+
+
         $this->dictionaries=array(
-            'langs'=>'mylangfile@planformation',
-            'tabname'=>array(MAIN_DB_PREFIX."table1",MAIN_DB_PREFIX."table2",MAIN_DB_PREFIX."table3"),		// List of tables we want to see into dictonnary editor
+            'langs'=>'planformation@planformation',
+            'tabname'=>array(MAIN_DB_PREFIX."planform_c_type_financement",MAIN_DB_PREFIX."table2",MAIN_DB_PREFIX."table3"),		// List of tables we want to see into dictonnary editor
             'tablib'=>array("Table1","Table2","Table3"),													// Label of tables
             'tabsql'=>array('SELECT f.rowid as rowid, f.code, f.label, f.active FROM '.MAIN_DB_PREFIX.'table1 as f','SELECT f.rowid as rowid, f.code, f.label, f.active FROM '.MAIN_DB_PREFIX.'table2 as f','SELECT f.rowid as rowid, f.code, f.label, f.active FROM '.MAIN_DB_PREFIX.'table3 as f'),	// Request to select fields
             'tabsqlsort'=>array("label ASC","label ASC","label ASC"),																					// Sort order
@@ -159,7 +179,20 @@ class modplanformation extends DolibarrModules
             'tabrowid'=>array("rowid","rowid","rowid"),																									// Name of columns with primary key (try to always name it 'rowid')
             'tabcond'=>array($conf->planformation->enabled,$conf->planformation->enabled,$conf->planformation->enabled)												// Condition to show each dictionary
         );
-        */
+          */
+        $this->dictionaries=array(
+        		'langs'=>'planformation@planformation',
+        		'tabname'=>array(MAIN_DB_PREFIX."planform_c_type_financement"),		// List of tables we want to see into dictonnary editor
+        		'tablib'=>array("PFDictTypeFin"),													// Label of tables
+        		'tabsql'=>array('SELECT f.rowid as rowid, f.code, f.label, f.active FROM '.MAIN_DB_PREFIX.'table1 as f'),	// Request to select fields
+        		'tabsqlsort'=>array("label ASC"),																					// Sort order
+        		'tabfield'=>array("code,label"),																					// List of fields (result of select to show dictionary)
+        		'tabfieldvalue'=>array("code,label"),																				// List of fields (list of fields to edit a record)
+        		'tabfieldinsert'=>array("code,label"),																			// List of fields (list of fields for insert)
+        		'tabrowid'=>array("rowid"),																									// Name of columns with primary key (try to always name it 'rowid')
+        		'tabcond'=>array($conf->planformation->enabled)												// Condition to show each dictionary
+        );
+
 
         // Boxes
 		// Add here list of php file(s) stored in core/boxes that contains class to show a box.
@@ -247,7 +280,7 @@ class modplanformation extends DolibarrModules
 	function init($options='')
 	{
 		$sql = array();
-		
+
 		define('INC_FROM_DOLIBARR',true);
 
 		dol_include_once('/planformation/config.php');
