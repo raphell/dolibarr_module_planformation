@@ -1,5 +1,5 @@
 <?php
-/* <one line to give the program's name and a brief idea of what it does.>
+/* <Plan Formation>
  * Copyright (C) 2015 ATM Consulting <support@atm-consulting.fr>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -23,13 +23,12 @@
  * Put some comments here
  */
 // Dolibarr environment
-$res = @include ("../../main.inc.php"); // From htdocs directory
-if (! $res) {
-	$res = @include ("../../../main.inc.php"); // From "custom" directory
-}
+
+require_once('../config.php');
 
 // Libraries
 require_once DOL_DOCUMENT_ROOT . "/core/lib/admin.lib.php";
+require_once '../class/planformation.class.php';
 require_once '../lib/planformation.lib.php';
 
 // Translations
@@ -123,9 +122,8 @@ foreach ( $dirmodels as $reldir ) {
 		$handle = opendir($dir);
 		if (is_resource($handle)) {
 			$var = true;
-
 			while ( ($file = readdir($handle)) !== false ) {
-				if ((substr($file, 0, 9) == 'mod_planformation_') && substr($file, dol_strlen($file) - 3, 3) == 'php') {
+				if ((substr($file, 0, 18) == 'mod_planformation_') && substr($file, dol_strlen($file) - 3, 3) == 'php') {
 					$file = substr($file, 0, dol_strlen($file) - 4);
 					require_once $dir . $file . '.php';
 
@@ -168,13 +166,13 @@ foreach ( $dirmodels as $reldir ) {
 										}
 										print '</td>';
 
-										$businesscase = new Lead($db);
-										$businesscase->initAsSpecimen();
+										$module_dest = new TPlanFormation();
+										$module_dest->_init_vars();
 
 										// Info
 										$htmltooltip = '';
 										$htmltooltip .= '' . $langs->trans("Version") . ': <b>' . $module->getVersion() . '</b><br>';
-										$nextval = $module->getNextValue($user->id, $mysoc, $businesscase);
+										$nextval = $module->getNextValue($user->id, $mysoc, $module_number);
 										if ("$nextval" != $langs->trans("NotAvailable")) // Keep " on nextval
 										{
 											$htmltooltip .= '' . $langs->trans("NextValue") . ': ';

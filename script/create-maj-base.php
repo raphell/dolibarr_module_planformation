@@ -10,14 +10,31 @@ if(!defined('INC_FROM_DOLIBARR')) {
 
 }
 
+dol_include_once('/planformation/class/dictionnaire.class.php');
+dol_include_once('/planformation/class/planformation.class.php');
 
-/* uncomment
+$ATMdb=new TPDOdb;
+$ATMdb->db->debug=true;
+
+$o=new TTypeFinancement;
+$o->init_db_by_vars($ATMdb);
+
+$o=new TPlanFormation;
+$o->init_db_by_vars($ATMdb);
+
+$o=new TSection;
+$o->init_db_by_vars($ATMdb);
+
+$o=new TSectionUserGroup;
+$o->init_db_by_vars($ATMdb);
+
+$sql = 'ALTER TABLE '.$o->table.' ADD UNIQUE INDEX uk_'.$o->table.'_fk_section_fk_usergroup(fk_usergroup,fk_section)';
+$result=$ATMdb->Execute($sql);
+
+$o=new TSectionUserGroup;
+$o->init_db_by_vars($ATMdb);
+
+$sql = 'ALTER TABLE '.$o->table.' ADD UNIQUE INDEX uk_'.$o->table.'_fk_section_fk_planform(fk_planform,fk_section)';
+$result=$ATMdb->Execute($sql);
 
 
-dol_include_once('/mymodule/class/xxx.class.php');
-
-$PDOdb=new TPDOdb;
-
-$o=new TXXX($db);
-$o->init_db_by_vars($PDOdb);
-*/

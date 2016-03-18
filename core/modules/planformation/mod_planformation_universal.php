@@ -21,12 +21,12 @@
  * \ingroup planformation
  * \brief Fichier contenant la classe du modele de numerotation de reference de planformation Universal
  */
-dol_include_once('/planformation/core/modules/lead/modules_planformation.php');
+dol_include_once('/planformation/core/modules/planformation/modules_planformation.php');
 
 /**
  * Classe du modele de numerotation de reference de projet Universal
  */
-class mod_palnformation_universal extends ModeleNumRefPlanFormation
+class mod_planformation_universal extends ModeleNumRefPlanFormation
 {
 
 	var $version = 'dolibarr'; // 'development', 'experimental', 'dolibarr'

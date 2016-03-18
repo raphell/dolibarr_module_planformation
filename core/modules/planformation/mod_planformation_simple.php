@@ -21,7 +21,7 @@
  * \ingroup lead
  * \brief File with class to manage the numbering module Simple for lead references
  */
-dol_include_once('/lead/core/modules/lead/modules_lead.php');
+dol_include_once('/planformation/core/modules/planformation/modules_planformation.php');
 
 /**
  * Class to manage the numbering module Simple for lead references
@@ -122,7 +122,7 @@ class mod_planformation_simple extends ModeleNumRefPlanFormation
 			return - 1;
 		}
 
-		$date = empty($pf->datec) ? dol_now() : $pf->datec;
+		$date = empty($pf->date_cre) ? dol_now() : $pf->date_cre;
 
 		// $yymm = strftime("%y%m",time());
 		$yymm = strftime("%y%m", $date);
