@@ -24,7 +24,14 @@ PFSimpleNumRefModelDesc = Retourne un numéro sous la forme PLF-yymm-nnnn où yy
 PFDictTypeFin=Plan Formation - Type de financement
 
 #
-# Menu
+# Menu / Button
 #
-PFPlanFormationList=Liste des plans de formations
-PFPlanFormationNew=Nouveau plans de formations
+PFPlanFormationList=Liste des plans de formation
+PFPlanFormationNew=Nouveau plans de formation
+PFPlanFormationEdit=Modifier le plans de formation
+PFPlanFormationCard=Fiche plans de formation
+
+#
+# Champs
+#
+PFTypeFin=Type de financement

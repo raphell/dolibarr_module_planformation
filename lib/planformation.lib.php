@@ -53,3 +53,24 @@ function planformationAdminPrepareHead()
 
     return $head;
 }
+
+function planformation_prepare_head(&$pf)
+{
+	global $langs, $conf;
+
+	$langs->load("planformation@planformation");
+
+	$h = 0;
+	$head = array();
+
+	$head[$h][0] = dol_buildpath("/planformation/planformation.php?id=".$pf->getId(), 1);
+	$head[$h][1] = $langs->trans("Card");
+	$head[$h][2] = 'planformation';
+	$h++;
+
+	complete_head_from_modules($conf, $langs, $object, $head, $h, 'planformation');
+
+	return $head;
+
+	return $head;
+}

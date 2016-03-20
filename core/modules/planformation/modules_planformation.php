@@ -84,7 +84,7 @@ abstract class ModeleNumRefPlanFormation
 	 * @param Lead $lead Lead
 	 * @return string Valeur
 	 */
-	function getNextValue($fk_user, $objsoc, $lead)
+	function getNextValue($fk_user, $objsoc, $pf)
 	{
 		global $langs;
 		return $langs->trans("NotAvailable");

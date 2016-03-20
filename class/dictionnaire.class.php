@@ -19,17 +19,56 @@
  * Class TTypeFinancement
  */
 
-class TTypeFinancement extends TObjetStd {
+class TTypeFinancement extends TObjetStd
+{
+	public $lines = array ();
+	public $errors = array();
+
+	/**
+	 *
+	 */
 	function __construct() {
 		global $langs;
 
-		parent::set_table(MAIN_DB_PREFIX.'planform_c_type_financement');
-		parent::add_champs('active,entity','type=entier;index;');
-		parent::add_champs('code, label','type=chaine');
+		parent::set_table(MAIN_DB_PREFIX . 'planform_c_type_financement');
+		parent::add_champs('active,entity', 'type=entier;index;');
+		parent::add_champs('code, label', 'type=chaine');
 
 		parent::_init_vars();
 		parent::start();
-
 	}
 
+	/**
+	 *
+	 * @param TPDOdb $PDOdb
+	 * @param string $outputlabel
+	 * @param string $fieldid
+	 */
+	public function fetchAll(TPDOdb &$PDOdb, $tablename, $outputlabel = 'code', $fieldid = 'rowid') {
+		$sql = "SELECT dict.rowid, dict.code, dict.label ";
+
+		$sql .= 'FROM ' . $tablename . ' as dict';
+
+		$sql .= " WHERE dict.active=1";
+
+		dol_syslog(get_class($this) . "::" . __METHOD__ . ' sql=' . $sql, LOG_DEBUG);
+		$result = $PDOdb->Execute($sql);
+		if ($result !== false) {
+
+			while ( $PDOdb->Get_line() ) {
+
+				if ($outputlabel == 'mix') {
+					$val = $PDOdb->Get_field('code') . ' - ' . $PDOdb->Get_field('label');
+				} else {
+					$val = $PDOdb->Get_field($outputlabel);
+				}
+				$this->lines[$PDOdb->Get_field('rowid')] = $val;
+			}
+
+			return 1;
+		} else {
+			$this->errors[] = $PDOdb->db->errorInfo()[2];
+			return - 1;
+		}
+	}
 }

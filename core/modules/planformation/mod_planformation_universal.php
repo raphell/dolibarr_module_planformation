@@ -100,10 +100,10 @@ class mod_planformation_universal extends ModeleNumRefPlanFormation
 	 *
 	 * @param int $fk_user User creating
 	 * @param Societe $objsoc Party
-	 * @param Lead $lead Lead
+	 * @param Lead $pf Plan Formation
 	 * @return string Valeur
 	 */
-	function getNextValue($fk_user, $objsoc, $lead)
+	function getNextValue($fk_user, $objsoc, $pf)
 	{
 		global $db, $conf;
 
