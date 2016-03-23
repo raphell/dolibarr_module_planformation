@@ -400,7 +400,7 @@ function _listPlanFormSection(TPDOdb &$PDOdb, TPlanFormation &$pf, TTypeFinancem
 							'recherche' => true,
 							'table' => 's'
 					),
-					'fk_usergroup' => array (
+					'group_name' => array (
 							'recherche' => $arrayUserGroups
 					)
 			),

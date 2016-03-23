@@ -202,7 +202,7 @@ function _card(TPDOdb &$PDOdb, TSection &$pfs, $mode = '') {
 
 	$TBS = new TTemplateTBS();
 
-	//Find already existing UserGroup to do not dispay them into list to add them
+	//Find all existing user group
 	$usergroupsArray=array();
 	$usergroups=new TPFUserGroup($db);
 	$result=$usergroups->fetchAll('ASC','t.nom',0,0);
