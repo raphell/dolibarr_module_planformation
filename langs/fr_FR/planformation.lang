@@ -41,6 +41,8 @@ PFSectionEdit=Modifier la section
 PFSectionCard=Fiche section
 PFDeleteConfirm=Etes vous sure de supprimer
 ImpossibleLoadElement=Impossible de trouvé l'éléments
+PFPlanFormationSectionList=Section(s) du plan
+PFSelectSectionToAdd=Ajouter une section au plan
 
 #
 # Champs

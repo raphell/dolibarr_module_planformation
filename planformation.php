@@ -1,4 +1,20 @@
 <?php
+/* <Plan Formation>
+ * Copyright (C) 2016 Florian HENRY <florian.henry@atm-consulting.fr>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 require_once ('config.php');
 
 // Security check
@@ -8,10 +24,13 @@ $result = restrictedArea($user, 'planformation', 0, 'planformation');
 
 require ('./class/planformation.class.php');
 require ('./class/dictionnaire.class.php');
+require ('./class/pfusergroup.class.php');
 
 $langs->trans('planformation@planformation');
 
 $PDOdb = new TPDOdb();
+
+// $PDOdb->debug = true;
 
 $tbs = new TTemplateTBS();
 $pf = new TPlanFormation();
@@ -55,14 +74,11 @@ if (! empty($action)) {
 			break;
 
 		case 'save' :
-			if ($pf->load($PDOdb, GETPOST('id', 'int'))) {
-				$pf->set_values($_REQUEST);
+			$pf->load($PDOdb, GETPOST('id', 'int'));
+			$pf->set_values($_REQUEST);
 
-				$pf->save($PDOdb);
-				_card($PDOdb, $pf, $typeFin, 'view');
-			} else {
-				setEventMessage($langs->trans('ImpossibleLoadElement'), 'errors');
-			}
+			$pf->save($PDOdb);
+			_card($PDOdb, $pf, $typeFin, 'view');
 			break;
 
 		case 'delete' :
@@ -75,11 +91,27 @@ if (! empty($action)) {
 			}
 
 			break;
+		case 'addsection' :
+
+			if ($pf->load($PDOdb, GETPOST('id', 'int'))) {
+				$pfs_link = new TSectionPlanFormation();
+				$pfs_link->fk_planform = $pf->getId();
+				$pfs_link->fk_section = GETPOST('fk_section', 'int');
+
+				$pfs_link->save($PDOdb);
+				_card($PDOdb, $pf, $typeFin, 'view');
+			} else {
+				setEventMessage($langs->trans('ImpossibleLoadElement'), 'errors');
+			}
+
+			break;
 	}
 } elseif (isset($_REQUEST['id'])) {
-	$pf->load($PDOdb, $_REQUEST['id']);
-
-	_card($PDOdb, $pf, $typeFin, 'view');
+	if ($pf->load($PDOdb, GETPOST('id', 'int'))) {
+		_card($PDOdb, $pf, $typeFin, 'view');
+	} else {
+		setEventMessage($langs->trans('ImpossibleLoadElement'), 'errors');
+	}
 } else {
 	_list($PDOdb, $pf);
 }
@@ -110,7 +142,7 @@ function _list(TPDOdb &$PDOdb, TPlanFormation &$pf) {
 				$_REQUEST['orderUp'] => 'ASC'
 		);
 
-		// $PDOdb->debug = true;
+	$formCore = new TFormCore($_SERVER['PHP_SELF'], 'formscore', 'POST');
 
 	echo $r->render($PDOdb, $pf->getSQLFetchAll(), array (
 			'limit' => array (
@@ -118,7 +150,7 @@ function _list(TPDOdb &$PDOdb, TPlanFormation &$pf) {
 					'nbLine' => $conf->liste_limit
 			),
 			'link' => array (
-					'ref' => img_picto('', 'object_dir') . ' <a href="?id=@ID@">@val@</a>'
+					'ref' => img_picto('', 'object_planformation@planformation') . ' <a href="?id=@ID@">@val@</a>'
 			),
 			'type' => array (
 					'date_start' => 'date',
@@ -127,7 +159,10 @@ function _list(TPDOdb &$PDOdb, TPlanFormation &$pf) {
 			'hide' => array (
 					'ID',
 					'fk_type_financement',
-					'type_fin_code'
+					'type_fin_code',
+					'fk_user_modification',
+					'fk_user_creation',
+					'entity'
 			),
 			'title' => $pf->getTrans(),
 			'liste' => array (
@@ -143,12 +178,20 @@ function _list(TPDOdb &$PDOdb, TPlanFormation &$pf) {
 					'date_end' => array (
 							'recherche' => 'calendars',
 							'table' => 'planform'
+					),
+					'title' => array (
+							'recherche' => true,
+							'table' => 'planform'
+					),
+					'ref' => array (
+							'recherche' => true,
+							'table' => 'planform'
 					)
 			),
 			'orderBy' => $TOrder
 	));
 
-	$PDOdb->execute($sql);
+	$formCore->end();
 }
 
 /**
@@ -169,6 +212,8 @@ function _info(TPDOdb &$PDOdb, TPlanFormation &$pf) {
 
 	$pf->date_creation = $pf->date_cre;
 	$pf->date_modification = $pf->date_maj;
+	$pf->user_creation = $pf->fk_user_creation;
+	$pf->user_modification = $pf->fk_user_modification;
 	print '<table width="100%"><tr><td>';
 	dol_print_object_info($pf);
 	print '</td></tr></table>';
@@ -197,6 +242,12 @@ function _card(TPDOdb &$PDOdb, TPlanFormation &$pf, TTypeFinancement &$typeFin, 
 	echo $formCore->hidden('id', $pf->getId());
 	echo $formCore->hidden('action', 'save');
 	echo $formCore->hidden('entity', getEntity());
+	if ($pf->getId() <= 0) {
+		echo $formCore->hidden('fk_user_creation', $user->id);
+	} else {
+		echo $formCore->hidden('fk_user_creation', $pf->fk_user_creation);
+	}
+	echo $formCore->hidden('fk_user_modification', $user->id);
 
 	$TBS = new TTemplateTBS();
 
@@ -257,5 +308,102 @@ function _card(TPDOdb &$PDOdb, TPlanFormation &$pf, TTypeFinancement &$typeFin, 
 			)
 	));
 
-	echo $formCore->end_form();
+	$formCore->end();
+
+	if ($mode == 'view') {
+
+		// Combo box to add section on paln form
+		$formCore = new TFormCore($_SERVER['PHP_SELF'], 'formaddSection', 'POST');
+		echo $formCore->hidden('action', 'addsection');
+		echo $formCore->hidden('id', $pf->getId());
+		$pfs = new TSection();
+		$availableSection = $pfs->getAvailableSection($PDOdb, $pf->getId());
+		echo $formCore->combo($langs->trans('PFSelectSectionToAdd'), 'fk_section', $availableSection, '');
+		echo $formCore->btsubmit($langs->trans('Add'), 'addsection');
+		$formCore->end();
+
+		_listPlanFormSection($PDOdb, $pf, $typeFin);
+	}
+}
+
+/**
+ *
+ * @param TPDOdb $PDOdb
+ * @param TPlanFormation $pf
+ * @param string $mode
+ */
+function _listPlanFormSection(TPDOdb &$PDOdb, TPlanFormation &$pf, TTypeFinancement &$typeFin) {
+	global $db, $langs;
+
+	$pfs_link = new TSectionPlanFormation();
+	$pfs = new TSection();
+
+	$r = new TListviewTBS('planform_section');
+
+	$TOrder = array (
+			's.ref' => 'DESC'
+	);
+	if (isset($_REQUEST['orderDown']))
+		$TOrder = array (
+				$_REQUEST['orderDown'] => 'DESC'
+		);
+	if (isset($_REQUEST['orderUp']))
+		$TOrder = array (
+				$_REQUEST['orderUp'] => 'ASC'
+		);
+
+	$formCore = new TFormCore($_SERVER['PHP_SELF'], 'formscore', 'POST');
+
+	// Build user group array for filtered list combo
+	$arrayUserGroups = array ();
+	$usergroups = new TPFUserGroup($db);
+	$result = $usergroups->fetchAll('ASC', 't.nom', 0, 0);
+	if ($result < 0) {
+		setEventMessages(null, $usergroups->errors, 'errors');
+	} else {
+		foreach ( $usergroups->lines as $line ) {
+			$arrayUserGroups[$line->id] = $line->nom;
+		}
+	}
+
+	echo $r->render($PDOdb, $pfs_link->getSQLFetchAll(array (
+			'p.rowid' => $pf->rowid
+	)), array (
+			'limit' => array (
+					'page' => (isset($_REQUEST['page']) ? $_REQUEST['page'] : 1),
+					'nbLine' => $conf->liste_limit
+			),
+			'link' => array (
+					'ref' => img_picto('', 'object_planformation@planformation') . ' <a href="?id=@ID@">@val@</a>'
+			),
+			'hide' => array (
+					'ID',
+					'section_id',
+					'fk_usergroup',
+					'fk_user_modification',
+					'fk_user_creation',
+					'entity',
+					'planform_id'
+			),
+			'title' => $pfs->getTrans(),
+			'liste' => array (
+					'titre' => $langs->trans('PFPlanFormationSectionList'),
+					'image' => img_picto('', 'planformation@planformation', '', 0),
+					'messageNothing' => $langs->transnoentities('NoRecDossierToDisplay')
+			),
+			'search' => array (
+					'title' => array (
+							'recherche' => true,
+							'table' => 's'
+					),
+					'ref' => array (
+							'recherche' => true,
+							'table' => 's'
+					),
+					'fk_usergroup' => array (
+							'recherche' => $arrayUserGroups
+					)
+			),
+			'orderBy' => $TOrder
+	));
 }

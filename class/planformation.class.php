@@ -21,6 +21,9 @@
 
 class TPlanFormation extends TObjetStd
 {
+
+	protected $ismultientitymanaged = 1;	// 0=No test on entity, 1=Test with field entity, 2=Test with link by societe
+
 	/**
 	 * __construct
 	 */
@@ -31,6 +34,7 @@ class TPlanFormation extends TObjetStd
 		parent::add_champs('fk_type_financement', array('type'=>'integer','index'=>true));
 		parent::add_champs('date_start, date_end', array('type'=>'date'));
 		parent::add_champs('ref,title', array('type'=>'string'));
+		parent::add_champs('fk_user_modification,fk_user_creation,entity', array('type'=>'integer','index'=>true));
 
 		parent::_init_vars();
 		parent::start();
@@ -61,11 +65,15 @@ class TPlanFormation extends TObjetStd
 		$sql .= ' planform.title, ';
 		$sql .= ' planform.date_start, ';
 		$sql .= ' planform.date_end, ';
+		$sql .= ' planform.fk_user_modification, ';
+		$sql .= ' planform.fk_user_creation, ';
+		$sql .= ' planform.entity, ';
 		$sql .= ' planform.fk_type_financement,';
 		$sql .= ' dict.code as type_fin_code, ';
 		$sql .= ' dict.label as type_fin_label ';
 		$sql .= ' FROM ' . $this->get_table().' as planform';
 		$sql .= ' LEFT JOIN ' . $dict->get_table() . ' as dict ON (planform.fk_type_financement=dict.rowid)';
+		$sql .= ' WHERE planform.entity IN ('.getEntity(get_class($this)).')';
 
 		return $sql;
 	}
@@ -155,6 +163,9 @@ class TPlanFormation extends TObjetStd
 
 		return null;
 	}
+
+
+
 }
 
 /**
@@ -162,16 +173,19 @@ class TPlanFormation extends TObjetStd
  */
 class TSection extends TObjetStd
 {
+	protected $ismultientitymanaged = 1;	// 0=No test on entity, 1=Test with field entity, 2=Test with link by societe
+
 	function __construct() {
 		global $langs;
 
 		parent::set_table(MAIN_DB_PREFIX . 'planform_section');
 		parent::add_champs('title,ref', array('type'=>'string','index'=>true));
+		parent::add_champs('fk_usergroup', array('type'=>'integer','index'=>true));
+		parent::add_champs('fk_user_modification,fk_user_creation,entity', array('type'=>'integer','index'=>true));
 
 		parent::_init_vars();
 		parent::start();
 
-		$this->setChild('TSectionUserGroup', 'fk_section');
 	}
 
 	/**
@@ -179,12 +193,19 @@ class TSection extends TObjetStd
 	 * @return string
 	 */
 	public function getSQLFetchAll() {
-		global $conf, $langs;
+		global $conf, $langs,$user;
 
-		$sql = 'SELECT s.rowid as ID ,';
+		$sql = 'SELECT s.rowid as ID,';
 		$sql .= ' s.ref, ';
-		$sql .= ' s.title ';
+		$sql .= ' s.title, ';
+		$sql .= ' s.fk_usergroup, ';
+		$sql .= ' g.nom as group_name, ';
+		$sql .= ' s.fk_user_modification, ';
+		$sql .= ' s.fk_user_creation, ';
+		$sql .= ' s.entity ';
 		$sql .= ' FROM ' . $this->get_table().' as s';
+		$sql .= ' INNER JOIN ' . MAIN_DB_PREFIX.'usergroup as g ON (s.fk_usergroup=g.rowid AND g.entity IN ('.getEntity('usergroup').'))';
+		$sql .= ' WHERE s.entity IN ('.getEntity(get_class($this)).')';
 
 		return $sql;
 	}
@@ -196,11 +217,14 @@ class TSection extends TObjetStd
 	public function getTrans($mode = 'std') {
 		global $langs;
 		$langs->load('planformation@planformation');
+		$langs->load("users");
 
 		$transarray = array (
 				'rowid' => $langs->trans('Id'),
 				'ref' => $langs->trans('Ref'),
 				'title' => $langs->trans('Title'),
+				'group_name' => $langs->trans('Group'),
+				'fk_usergroup' => $langs->trans('Group'),
 		);
 		if ($mode == 'title') {
 			foreach ( $transarray as $key => $val ) {
@@ -271,21 +295,46 @@ class TSection extends TObjetStd
 
 		return null;
 	}
-}
 
-/**
- * Class TSectionUserGroup
- */
-class TSectionUserGroup extends TObjetStd
-{
-	function __construct() {
-		global $langs;
 
-		parent::set_table(MAIN_DB_PREFIX . 'planform_usergroup');
-		parent::add_champs('fk_usergroup,fk_section', array('type'=>'integer','index'=>true));
+	/**
+	 *
+	 * @param TPDOdb $PDOdb
+	 * @param number $planform_id
+	 * @return array
+	 */
+	public function getAvailableSection(TPDOdb &$PDOdb, $planform_id=0) {
+		$pfs_link = new TSectionPlanFormation();
+		$sec = new TSection();
 
-		parent::_init_vars();
-		parent::start();
+		//Find already linked section to avoid them into comobox
+		$alreadylinked=array();
+		$sql = $pfs_link->getSQLFetchAll(array (
+				'p.rowid' => $planform_id
+		));
+		$result = $PDOdb->Execute($sql);
+		if ($result !== false) {
+			while ( $PDOdb->Get_line() ) {
+				$alreadylinked[$PDOdb->Get_field('section_id')] = $PDOdb->Get_field('section_id');
+			}
+		} else {
+			setEventMessage($PDOdb->db->errorInfo()[2],'errors');
+		}
+
+		//Build Combo box array
+		$sql = $sec->getSQLFetchAll();
+		$result = $PDOdb->Execute($sql);
+		if ($result !== false) {
+			while ( $PDOdb->Get_line() ) {
+				if (!array_key_exists($PDOdb->Get_field('ID'), $alreadylinked)) {
+					$availableSection[$PDOdb->Get_field('ID')] = $PDOdb->Get_field('ref') .' - ' . dol_trunc($PDOdb->Get_field('title'),20);
+				}
+			}
+		} else {
+			setEventMessage($PDOdb->db->errorInfo()[2],'errors');
+		}
+
+		return $availableSection;
 
 	}
 }
@@ -298,10 +347,69 @@ class TSectionPlanFormation extends TObjetStd
 	function __construct() {
 		global $langs;
 
-		parent::set_table(MAIN_DB_PREFIX . 'planform_section');
+		parent::set_table(MAIN_DB_PREFIX . 'planform_planform_section');
 		parent::add_champs('fk_planform,fk_section', array('type'=>'integer','index'=>true));
 
 		parent::_init_vars();
 		parent::start();
+	}
+
+	/**
+	 *
+	 * @return string
+	 */
+	public function getSQLFetchAll($filterAnd=array(),$filterOr=array()) {
+		global $conf, $langs,$user, $db;
+
+		$pf = new TPlanFormation();
+		$sec = new TSection();
+
+		$sql = 'SELECT ps.rowid as ID ,';
+		$sql .= ' s.rowid as section_id, ';
+		$sql .= ' s.ref, ';
+		$sql .= ' s.title, ';
+		$sql .= ' s.fk_usergroup, ';
+		$sql .= ' g.nom as group_name, ';
+		$sql .= ' s.fk_user_modification, ';
+		$sql .= ' s.fk_user_creation, ';
+		$sql .= ' s.entity, ';
+		$sql .= ' p.rowid as planform_id ';
+		$sql .= ' FROM ' . $this->get_table().' as ps';
+		$sql .= ' INNER JOIN '.$pf->get_table().' as p ON (p.rowid=ps.fk_planform)';
+		$sql .= ' INNER JOIN '.$sec->get_table().' as s ON (s.rowid=ps.fk_section)';
+		$sql .= ' INNER JOIN ' . MAIN_DB_PREFIX.'usergroup as g ON (s.fk_usergroup=g.rowid AND g.entity IN ('.getEntity('usergroup').'))';
+		$sql .= ' WHERE s.entity IN ('.getEntity(get_class($sec)).') AND p.entity IN ('.getEntity(get_class($pf)).')';
+
+		// Manage filter
+		$sqlwhere = array ();
+		if (count($filterAnd) > 0) {
+			foreach ( $filterAnd as $key => $value ) {
+				if (($key == 's.rowid' || $key == 'p.rowid') && is_numeric($value)) {
+					$sqlwhere[] = $key . ' = ' . $db->escape(price2num($value));
+				} else {
+					$sqlwhere[] = $key . ' LIKE \'%' . $db->escape($value) . '%\'';
+				}
+			}
+		}
+		if (count($sqlwhere) > 0) {
+			$sql .= ' AND '. implode(' AND ', $sqlwhere);
+		}
+
+		// Manage filter OR
+		$sqlwhere = array ();
+		if (count($filterOr) > 0) {
+			foreach ( $filterOr as $key => $value ) {
+				if (($key == 's.rowid' || $key == 'p.rowid') && is_numeric($value)) {
+					$sqlwhere[] = $key . ' = ' . $escape(price2num($value));
+				} else {
+					$sqlwhere[] = $key . ' LIKE \'%' . $db->escape($value) . '%\'';
+				}
+			}
+		}
+		if (count($sqlwhere) > 0) {
+			$sql .= ' AND ('.implode(' OR ', $sqlwhere).')';
+		}
+
+		return $sql;
 	}
 }
