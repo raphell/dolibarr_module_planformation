@@ -17,20 +17,20 @@
  */
 
 /**
- * \file planformation/core/modules/planformation/mod_planformation_simple.php
+ * \file planformation/core/modules/planformation/mod_planformation_section_simple.php
  * \ingroup planformation
  * \brief File with class to manage the numbering module Simple for planformation references
  */
 dol_include_once('/planformation/core/modules/planformation/modules_planformation.php');
 
 /**
- * Class to manage the numbering module Simple for planformation references
+ * Class to manage the numbering module Simple for lead references
  */
-class mod_planformation_simple extends ModeleNumRefPlanFormation
+class mod_planformation_section_simple extends ModeleNumRefPlanFormation
 {
 
 	var $version = 'dolibarr'; // 'development', 'experimental', 'dolibarr'
-	var $prefix = 'PLF-';
+	var $prefix = 'PLS-';
 
 	var $error = '';
 
@@ -44,7 +44,7 @@ class mod_planformation_simple extends ModeleNumRefPlanFormation
 	function info()
 	{
 		global $langs;
-		return $langs->trans("PFSimpleNumRefModelDesc", $this->prefix);
+		return $langs->trans("PFSimpleNumRefModelSecDesc", $this->prefix);
 	}
 
 	/**
@@ -72,7 +72,7 @@ class mod_planformation_simple extends ModeleNumRefPlanFormation
 
 		$posindice = 8;
 		$sql = "SELECT MAX(SUBSTRING(ref FROM " . $posindice . ")) as max";
-		$sql .= " FROM " . MAIN_DB_PREFIX . "planform";
+		$sql .= " FROM " . MAIN_DB_PREFIX . "planform_section";
 		$sql .= " WHERE ref LIKE '" . $this->prefix . "____-%'";
 		// $sql.= " AND entity = ".$conf->entity;
 		$resql = $db->query($sql);
@@ -97,17 +97,17 @@ class mod_planformation_simple extends ModeleNumRefPlanFormation
 	 *
 	 * @param int $fk_user User creating
 	 * @param Societe $objsoc Party
-	 * @param PlanForm $pf plan form
+	 * @param TSection $pfs plan form
 	 * @return string Valeur
 	 */
-	function getNextValue($fk_user, $objsoc, $pf)
+	function getNextValue($fk_user, $objsoc, $pfs)
 	{
 		global $db, $conf;
 
 		// D'abord on recupere la valeur max
 		$posindice = 10;
 		$sql = "SELECT MAX(SUBSTRING(ref FROM " . $posindice . ")) as max";
-		$sql .= " FROM " . MAIN_DB_PREFIX . "planform";
+		$sql .= " FROM " . MAIN_DB_PREFIX . "planform_section";
 		$sql .= " WHERE ref like '" . $this->prefix . "____-%'";
 
 		$resql = $db->query($sql);
@@ -122,7 +122,7 @@ class mod_planformation_simple extends ModeleNumRefPlanFormation
 			return - 1;
 		}
 
-		$date = empty($pf->date_cre) ? dol_now() : $pf->date_cre;
+		$date = empty($pfs->date_cre) ? dol_now() : $pfs->date_cre;
 
 		// $yymm = strftime("%y%m",time());
 		$yymm = strftime("%y%m", $date);

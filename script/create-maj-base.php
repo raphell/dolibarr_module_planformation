@@ -22,19 +22,22 @@ $o->init_db_by_vars($ATMdb);
 $o=new TPlanFormation;
 $o->init_db_by_vars($ATMdb);
 
+$sql = 'ALTER TABLE '.$o->table.' ADD UNIQUE INDEX uk_'.str_replace(MAIN_DB_PREFIX, '', $o->table).'_ref(ref)';
+$result=$ATMdb->Execute($sql);
+
 $o=new TSection;
 $o->init_db_by_vars($ATMdb);
 
 $o=new TSectionUserGroup;
 $o->init_db_by_vars($ATMdb);
 
-$sql = 'ALTER TABLE '.$o->table.' ADD UNIQUE INDEX uk_'.$o->table.'_fk_section_fk_usergroup(fk_usergroup,fk_section)';
+$sql = 'ALTER TABLE '.$o->table.' ADD UNIQUE INDEX uk_'.str_replace(MAIN_DB_PREFIX, '', $o->table).'_fk_section_fk_usergroup(fk_usergroup,fk_section)';
 $result=$ATMdb->Execute($sql);
 
-$o=new TSectionUserGroup;
+$o=new TSectionPlanFormation;
 $o->init_db_by_vars($ATMdb);
 
-$sql = 'ALTER TABLE '.$o->table.' ADD UNIQUE INDEX uk_'.$o->table.'_fk_section_fk_planform(fk_planform,fk_section)';
+$sql = 'ALTER TABLE '.$o->table.' ADD UNIQUE INDEX uk_'.str_replace(MAIN_DB_PREFIX, '', $o->table).'_fk_section_fk_planform(fk_planform,fk_section)';
 $result=$ATMdb->Execute($sql);
 
 

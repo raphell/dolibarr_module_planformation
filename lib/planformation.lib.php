@@ -54,7 +54,7 @@ function planformationAdminPrepareHead()
     return $head;
 }
 
-function planformation_prepare_head(&$pf)
+function planformation_prepare_head(TPlanFormation &$pf)
 {
 	global $langs, $conf;
 
@@ -68,7 +68,38 @@ function planformation_prepare_head(&$pf)
 	$head[$h][2] = 'planformation';
 	$h++;
 
+	$head[$h][0] = dol_buildpath("/planformation/planformation.php?id=".$pf->getId().'&action=info', 1);
+	$head[$h][1] = $langs->trans("Info");
+	$head[$h][2] = 'info';
+	$h++;
+
 	complete_head_from_modules($conf, $langs, $object, $head, $h, 'planformation');
+
+	return $head;
+
+	return $head;
+}
+
+function planformation_section_prepare_head(TSection &$pfs)
+{
+	global $langs, $conf;
+
+	$langs->load("planformation@planformation");
+
+	$h = 0;
+	$head = array();
+
+	$head[$h][0] = dol_buildpath("/planformation/section.php?id=".$pfs->getId(), 1);
+	$head[$h][1] = $langs->trans("Card");
+	$head[$h][2] = 'section';
+	$h++;
+
+	$head[$h][0] = dol_buildpath("/planformation/section.php?id=".$pfs->getId().'&action=info', 1);
+	$head[$h][1] = $langs->trans("Info");
+	$head[$h][2] = 'info';
+	$h++;
+
+	complete_head_from_modules($conf, $langs, $object, $head, $h, 'planformation_section');
 
 	return $head;
 

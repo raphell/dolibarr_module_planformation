@@ -17,16 +17,16 @@
  */
 
 /**
- * \file planformation/core/modules/planformation/mod_planformation_universal.php
+ * \file planformation/core/modules/planformation/mod_planformation_section_universal.php
  * \ingroup planformation
  * \brief Fichier contenant la classe du modele de numerotation de reference de planformation Universal
  */
 dol_include_once('/planformation/core/modules/planformation/modules_planformation.php');
 
 /**
- * Classe du modele de numerotation de reference de planformation Universal
+ * Classe du modele de numerotation de reference de projet Universal
  */
-class mod_planformation_universal extends ModeleNumRefPlanFormation
+class mod_planformation_section_universal extends ModeleNumRefPlanFormation
 {
 
 	var $version = 'dolibarr'; // 'development', 'experimental', 'dolibarr'
@@ -51,19 +51,19 @@ class mod_planformation_universal extends ModeleNumRefPlanFormation
 		$texte = $langs->trans('GenericNumRefModelDesc') . "<br>\n";
 		$texte .= '<form action="' . $_SERVER["PHP_SELF"] . '" method="POST">';
 		$texte .= '<input type="hidden" name="token" value="' . $_SESSION['newtoken'] . '">';
-		$texte .= '<input type="hidden" name="action" value="updateMask">';
-		$texte .= '<input type="hidden" name="maskconstpf" value="PF_UNIVERSAL_MASK">';
+		$texte .= '<input type="hidden" name="action" value="updateMaskSection">';
+		$texte .= '<input type="hidden" name="maskconstpfs" value="PF_SECTION_UNIVERSAL_MASK">';
 		$texte .= '<table class="nobordernopadding" width="100%">';
 
-		$tooltip = $langs->trans("GenericMaskCodes", $langs->transnoentities("PFPlanFormation"), $langs->transnoentities("PFPlanFormation"));
+		$tooltip = $langs->trans("GenericMaskCodes", $langs->transnoentities("PFSection"), $langs->transnoentities("PFSection"));
 		$tooltip .= $langs->trans("GenericMaskCodes2");
 		$tooltip .= $langs->trans("GenericMaskCodes3");
-		$tooltip .= $langs->trans("GenericMaskCodes4a", $langs->transnoentities("PFPlanFormation"), $langs->transnoentities("PFPlanFormation"));
+		$tooltip .= $langs->trans("GenericMaskCodes4a", $langs->transnoentities("PFSection"), $langs->transnoentities("PFSection"));
 		$tooltip .= $langs->trans("GenericMaskCodes5");
 
 		// Parametrage du prefix
 		$texte .= '<tr><td>' . $langs->trans("Mask") . ':</td>';
-		$texte .= '<td align="right">' . $form->textwithpicto('<input type="text" class="flat" size="24" name="maskpf" value="' . $conf->global->PF_UNIVERSAL_MASK . '">', $tooltip, 1, 1) . '</td>';
+		$texte .= '<td align="right">' . $form->textwithpicto('<input type="text" class="flat" size="24" name="maskpfs" value="' . $conf->global->PF_SECTION_UNIVERSAL_MASK . '">', $tooltip, 1, 1) . '</td>';
 
 		$texte .= '<td align="left" rowspan="2">&nbsp; <input type="submit" class="button" value="' . $langs->trans("Modify") . '" name="Button"></td>';
 
@@ -110,7 +110,7 @@ class mod_planformation_universal extends ModeleNumRefPlanFormation
 		require_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
 
 		// On defini critere recherche compteur
-		$mask = $conf->global->PF_UNIVERSAL_MASK;
+		$mask = $conf->global->PF_SECTION_UNIVERSAL_MASK;
 
 		if (! $mask) {
 			$this->error = 'NotConfigured';

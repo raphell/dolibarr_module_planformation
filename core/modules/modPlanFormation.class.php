@@ -140,6 +140,24 @@ class modPlanFormation extends DolibarrModules
 				'current',
 				1
 		);
+		$this->const[] = array (
+				'PF_SECTION_ADDON',
+				'chaine',
+				'mod_planformation_section_simple',
+				'Numbering section planformation rule',
+				0,
+				'current',
+				1
+		);
+		$this->const[] = array (
+				'PF_SECTION_UNIVERSAL_MASK',
+				'chaine',
+				'',
+				'Numbering section planformation rule',
+				0,
+				'current',
+				1
+		);
 
 		// Array to add new pages in new tabs
 		// Example: $this->tabs = array('objecttype:+tabname1:Title1:mylangfile@planformation:$user->rights->planformation->read:/planformation/mynewtab1.php?id=__ID__', // To add a new tab identified by code tabname1
@@ -230,13 +248,13 @@ class modPlanFormation extends DolibarrModules
 
 		// Permissions
 		$this->rights = array (); // Permission array used by this module
-		$r = 0;
+		$r = 1;
 
 		// Add here list of permission defined by an id, a label, a boolean and two constant strings.
 		// Example:
 		// Permission1049511
 		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = 'Voir les plans de formation';
+		$this->rights[$r][1] = 'Voir les plans de formations';
 		$this->rights[$r][3] = 0;
 		$this->rights[$r][4] = 'read';
 		$r ++;
@@ -253,6 +271,30 @@ class modPlanFormation extends DolibarrModules
 		$this->rights[$r][1] = 'Supprimer les plans de formations';
 		$this->rights[$r][3] = 0;
 		$this->rights[$r][4] = 'delete';
+		$r ++;
+
+		// Permission1049514
+		$this->rights[$r][0] = $this->numero . $r;
+		$this->rights[$r][1] = 'Voir les sections';
+		$this->rights[$r][3] = 0;
+		$this->rights[$r][4] = 'section';
+		$this->rights[$r][5] = 'read';
+		$r ++;
+
+		// Permission1049515
+		$this->rights[$r][0] = $this->numero . $r;
+		$this->rights[$r][1] = 'Créer/Modifier les sections';
+		$this->rights[$r][3] = 0;
+		$this->rights[$r][4] = 'section';
+		$this->rights[$r][5] = 'write';
+		$r ++;
+
+		// Permission1049516
+		$this->rights[$r][0] = $this->numero . $r;
+		$this->rights[$r][1] = 'Supprimer les sections';
+		$this->rights[$r][3] = 0;
+		$this->rights[$r][4] = 'section';
+		$this->rights[$r][5] = 'delete';
 		$r ++;
 
 		// Main menu entries
@@ -313,6 +355,51 @@ class modPlanFormation extends DolibarrModules
 				'position' => 100 + $r,
 				'enabled' => '$conf->planformation->enabled',
 				'perms' => '$user->rights->planformation->write',
+				'target' => '',
+				'user' => 2
+		);
+
+
+		$r ++;
+		$this->menu[$r] = array (
+				'fk_menu' => 'fk_mainmenu=planformation',
+				'type' => 'left',
+				'titre' => 'PFSection',
+				'mainmenu' => 'planformation',
+				'leftmenu' => 'pfsectionleft',
+				'url' => '/planformation/section.php?action=list',
+				'langs' => 'planformation@planformation',
+				'position' => 100 + $r,
+				'enabled' => '',
+				'perms' => '$user->rights->planformation->section->read',
+				'target' => '',
+				'user' => 2
+		);
+		$r ++;
+		$this->menu[$r] = array (
+				'fk_menu' => 'fk_mainmenu=planformation,fk_leftmenu=pfsectionleft',
+				'type' => 'left',
+				'titre' => 'PFSectionList',
+				'mainmenu' => 'planformation',
+				'url' => '/planformation/section.php?action=list',
+				'langs' => 'planformation@planformation',
+				'position' => 100 + $r,
+				'enabled' => '$conf->planformation->enabled',
+				'perms' => '$user->rights->planformation->section->read',
+				'target' => '',
+				'user' => 2
+		);
+		$r ++;
+		$this->menu[$r] = array (
+				'fk_menu' => 'fk_mainmenu=planformation,fk_leftmenu=pfsectionleft',
+				'type' => 'left',
+				'titre' => 'PFSectionNew',
+				'mainmenu' => 'planformation',
+				'url' => '/planformation/section.php?action=new',
+				'langs' => 'planformation@planformation',
+				'position' => 100 + $r,
+				'enabled' => '$conf->planformation->enabled',
+				'perms' => '$user->rights->planformation->section->write',
 				'target' => '',
 				'user' => 2
 		);
