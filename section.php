@@ -86,7 +86,6 @@ if (! empty($action)) {
 
 			break;
 		case 'info' :
-        
 			if ($pfs->load($PDOdb, GETPOST('id', 'int'))) {
 				_info($PDOdb, $pfs);
 			} else {
