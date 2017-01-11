@@ -115,7 +115,6 @@ function _list(TPDOdb &$PDOdb, TSection &$pfs) {
 	llxHeader('', $langs->trans('PFPlanFormationList'));
 
 	$r = new TListviewTBS('planform');
-    
 
 	$TOrder = array (
 			's.ref' => 'DESC'
@@ -129,7 +128,6 @@ function _list(TPDOdb &$PDOdb, TSection &$pfs) {
 				$_REQUEST['orderUp'] => 'ASC'
 		);
 
-    
 	echo $r->render($PDOdb, $pfs->getSQLFetchAll(), array (
 			'limit' => array (
 					'page' => (isset($_REQUEST['page']) ? $_REQUEST['page'] : 1),
@@ -168,7 +166,7 @@ function _info(TPDOdb &$PDOdb, TSection &$pfs) {
 	llxHeader('', $langs->trans("PFPlanFormation"));
 	$head = planformation_section_prepare_head($pfs);
 	dol_fiche_head($head, 'info', $langs->trans("PFSectionCard"), 0);
-    
+
 	$pfs->date_creation = $pfs->date_cre;
 	$pfs->date_modification = $pfs->date_maj;
 	$pfs->user_creation = $pfs->fk_user_creation;
@@ -230,6 +228,7 @@ function _card(TPDOdb &$PDOdb, TSection &$pfs, $mode = '') {
 	if ($mode == 'edit') {
 		$data['titre'] = load_fiche_titre($pfs->getId() > 0 ? $langs->trans("PFSectionEdit") : $langs->trans("PFSectionNew"), '');
 		$data['title'] = $formCore->texte('', 'title', $pfs->title, 30, 255);
+		$data['budget'] = $formCore->texte('', 'budget', $pfs->budget, 30, 255); /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////s
 		if ($conf->global->PF_SECTION_ADDON == 'mod_planformation_section_universal') {
 			$data['ref'] = $formCore->texte('', 'ref', $pfs->ref, 15, 255);
 		} elseif ($conf->global->PF_SECTION_ADDON == 'mod_planformation_section_simple') {
@@ -248,6 +247,7 @@ function _card(TPDOdb &$PDOdb, TSection &$pfs, $mode = '') {
 		$data['title'] = $pfs->title;
 		$data['ref'] = $formCore->texte('', 'ref', $pfs->ref, 15);
 		$data['fk_usergroup'] =  $usergroupsArray[$pfs->fk_usergroup];
+		$data['budget'] = $pfs->budget;   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		$buttons = $btRetour . ' ' . $btModifier . ' ' . $btDelete;
 	}
 

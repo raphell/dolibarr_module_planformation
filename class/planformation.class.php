@@ -80,7 +80,7 @@ class TPlanFormation extends TObjetStd
 		$sql .= ' FROM ' . $this->get_table().' as planform';
 		$sql .= ' LEFT JOIN ' . $dict->get_table() . ' as dict ON (planform.fk_type_financement=dict.rowid)';
 		$sql .= ' WHERE planform.entity IN ('.getEntity(get_class($this)).')';
-        
+
 		return $sql;
 	}
 
@@ -191,7 +191,7 @@ class TSection extends TObjetStd
 		parent::add_champs('title,ref', array('type'=>'string','index'=>true));
 		parent::add_champs('fk_usergroup', array('type'=>'integer','index'=>true));
 		parent::add_champs('fk_user_modification,fk_user_creation,entity', array('type'=>'integer','index'=>true));
-
+		parent::add_champs('budget' , array('type' =>'float', 'index'=>true));
 		parent::_init_vars();
 		parent::start();
 
@@ -211,11 +211,12 @@ class TSection extends TObjetStd
 		$sql .= ' g.nom as group_name, ';
 		$sql .= ' s.fk_user_modification, ';
 		$sql .= ' s.fk_user_creation, ';
+		$sql .= ' s.budget, ';     //////////////////////////////////////////////////////////////////////////////////////////
 		$sql .= ' s.entity ';
 		$sql .= ' FROM ' . $this->get_table().' as s';
 		$sql .= ' INNER JOIN ' . MAIN_DB_PREFIX.'usergroup as g ON (s.fk_usergroup=g.rowid AND g.entity IN ('.getEntity('usergroup').'))';
 		$sql .= ' WHERE s.entity IN ('.getEntity(get_class($this)).')';
-         
+
 		return $sql;
 	}
 
@@ -234,6 +235,7 @@ class TSection extends TObjetStd
 				'title' => $langs->trans('Title'),
 				'group_name' => $langs->trans('Group'),
 				'fk_usergroup' => $langs->trans('Group'),
+				'budget' => $langs ->trans('Budget'), ///////////////////////////////////////////////////////////////////////
 		);
 		if ($mode == 'title') {
 			foreach ( $transarray as $key => $val ) {
