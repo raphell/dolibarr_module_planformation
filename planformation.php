@@ -272,6 +272,9 @@ function _card(TPDOdb &$PDOdb, TPlanFormation &$pf, TTypeFinancement &$typeFin, 
 		$data['type_fin_label'] = $formCore->combo('', 'fk_type_financement', $typeFin->lines, '');
 		$data['date_start'] = $formCore->doliCalendar('date_start', $pf->date_start);
 		$data['date_end'] = $formCore->doliCalendar('date_end', $pf->date_end);
+		// Ici
+		$data['budget'] = $formCore->texte('', 'budget', $pf->budget, 30, 255);
+		// Jusque là
 		if ($conf->global->PF_ADDON == 'mod_planformation_universal') {
 			$data['ref'] = $formCore->texte('', 'ref', $pf->ref, 15, 255);
 		} elseif ($conf->global->PF_ADDON == 'mod_planformation_simple') {
@@ -290,6 +293,9 @@ function _card(TPDOdb &$PDOdb, TPlanFormation &$pf, TTypeFinancement &$typeFin, 
 		$data['date_start'] = dol_print_date($pf->date_start);
 		$data['date_end'] = dol_print_date($pf->date_end);
 		$data['title'] = $pf->title;
+		// Ici
+		$data['budget'] = $pf->budget;
+		// Jusque là
 		$data['ref'] = $formCore->texte('', 'ref', $pf->ref, 15);
 		$buttons = $btRetour . ' ' . $btModifier . ' ' . $btDelete;
 	}

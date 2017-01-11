@@ -115,6 +115,7 @@ function _list(TPDOdb &$PDOdb, TSection &$pfs) {
 	llxHeader('', $langs->trans('PFPlanFormationList'));
 
 	$r = new TListviewTBS('planform');
+    
 
 	$TOrder = array (
 			's.ref' => 'DESC'
@@ -128,6 +129,7 @@ function _list(TPDOdb &$PDOdb, TSection &$pfs) {
 				$_REQUEST['orderUp'] => 'ASC'
 		);
 
+    
 	echo $r->render($PDOdb, $pfs->getSQLFetchAll(), array (
 			'limit' => array (
 					'page' => (isset($_REQUEST['page']) ? $_REQUEST['page'] : 1),
@@ -166,11 +168,11 @@ function _info(TPDOdb &$PDOdb, TSection &$pfs) {
 	llxHeader('', $langs->trans("PFPlanFormation"));
 	$head = planformation_section_prepare_head($pfs);
 	dol_fiche_head($head, 'info', $langs->trans("PFSectionCard"), 0);
-
-	$pf->date_creation = $pfs->date_cre;
-	$pf->date_modification = $pfs->date_maj;
-	$pf->user_creation = $pfs->fk_user_creation;
-	$pf->user_modification = $pfs->fk_user_modification;
+    
+	$pfs->date_creation = $pfs->date_cre;
+	$pfs->date_modification = $pfs->date_maj;
+	$pfs->user_creation = $pfs->fk_user_creation;
+	$pfs->user_modification = $pfs->fk_user_modification;
 	print '<table width="100%"><tr><td>';
 	dol_print_object_info($pfs);
 	print '</td></tr></table>';

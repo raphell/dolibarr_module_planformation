@@ -34,6 +34,9 @@ class TPlanFormation extends TObjetStd
 		parent::add_champs('fk_type_financement', array('type'=>'integer','index'=>true));
 		parent::add_champs('date_start, date_end', array('type'=>'date'));
 		parent::add_champs('ref,title', array('type'=>'string'));
+		// Ici
+		parent::add_champs('budget', array('type'=>'float'));
+		// Jusque là
 		parent::add_champs('fk_user_modification,fk_user_creation,entity', array('type'=>'integer','index'=>true));
 
 		parent::_init_vars();
@@ -69,12 +72,15 @@ class TPlanFormation extends TObjetStd
 		$sql .= ' planform.fk_user_creation, ';
 		$sql .= ' planform.entity, ';
 		$sql .= ' planform.fk_type_financement,';
+		// Ici
+		$sql .= ' planform.budget, ';
+		// Jusque là
 		$sql .= ' dict.code as type_fin_code, ';
 		$sql .= ' dict.label as type_fin_label ';
 		$sql .= ' FROM ' . $this->get_table().' as planform';
 		$sql .= ' LEFT JOIN ' . $dict->get_table() . ' as dict ON (planform.fk_type_financement=dict.rowid)';
 		$sql .= ' WHERE planform.entity IN ('.getEntity(get_class($this)).')';
-
+        
 		return $sql;
 	}
 
@@ -92,6 +98,9 @@ class TPlanFormation extends TObjetStd
 				'date_start' => $langs->trans('DateStart'),
 				'date_end' => $langs->trans('DateEnd'),
 				'title' => $langs->trans('Title'),
+				// Ici
+				'budget' => $langs->trans('Budget'),
+				// Jusque là
 				'type_fin_label' => $langs->trans('PFTypeFin')
 		);
 		if ($mode == 'title') {
@@ -206,7 +215,7 @@ class TSection extends TObjetStd
 		$sql .= ' FROM ' . $this->get_table().' as s';
 		$sql .= ' INNER JOIN ' . MAIN_DB_PREFIX.'usergroup as g ON (s.fk_usergroup=g.rowid AND g.entity IN ('.getEntity('usergroup').'))';
 		$sql .= ' WHERE s.entity IN ('.getEntity(get_class($this)).')';
-
+         
 		return $sql;
 	}
 
