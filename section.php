@@ -86,6 +86,7 @@ if (! empty($action)) {
 
 			break;
 		case 'info' :
+        
 			if ($pfs->load($PDOdb, GETPOST('id', 'int'))) {
 				_info($PDOdb, $pfs);
 			} else {
@@ -167,10 +168,10 @@ function _info(TPDOdb &$PDOdb, TSection &$pfs) {
 	$head = planformation_section_prepare_head($pfs);
 	dol_fiche_head($head, 'info', $langs->trans("PFSectionCard"), 0);
 
-	$pf->date_creation = $pfs->date_cre;
-	$pf->date_modification = $pfs->date_maj;
-	$pf->user_creation = $pfs->fk_user_creation;
-	$pf->user_modification = $pfs->fk_user_modification;
+	$pfs->date_creation = $pfs->date_cre;
+	$pfs->date_modification = $pfs->date_maj;
+	$pfs->user_creation = $pfs->fk_user_creation;
+	$pfs->user_modification = $pfs->fk_user_modification;
 	print '<table width="100%"><tr><td>';
 	dol_print_object_info($pfs);
 	print '</td></tr></table>';
@@ -228,6 +229,7 @@ function _card(TPDOdb &$PDOdb, TSection &$pfs, $mode = '') {
 	if ($mode == 'edit') {
 		$data['titre'] = load_fiche_titre($pfs->getId() > 0 ? $langs->trans("PFSectionEdit") : $langs->trans("PFSectionNew"), '');
 		$data['title'] = $formCore->texte('', 'title', $pfs->title, 30, 255);
+		$data['budget'] = $formCore->texte('', 'budget', $pfs->budget, 30, 255); /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////s
 		if ($conf->global->PF_SECTION_ADDON == 'mod_planformation_section_universal') {
 			$data['ref'] = $formCore->texte('', 'ref', $pfs->ref, 15, 255);
 		} elseif ($conf->global->PF_SECTION_ADDON == 'mod_planformation_section_simple') {
@@ -246,6 +248,7 @@ function _card(TPDOdb &$PDOdb, TSection &$pfs, $mode = '') {
 		$data['title'] = $pfs->title;
 		$data['ref'] = $formCore->texte('', 'ref', $pfs->ref, 15);
 		$data['fk_usergroup'] =  $usergroupsArray[$pfs->fk_usergroup];
+		$data['budget'] = $pfs->budget;   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		$buttons = $btRetour . ' ' . $btModifier . ' ' . $btDelete;
 	}
 
