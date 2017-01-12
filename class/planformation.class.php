@@ -382,8 +382,8 @@ class TSectionPlanFormation extends TObjetStd
 		$sql .= ' g.nom as group_name, ';
 		$sql .= ' s.fk_user_modification, ';
 		$sql .= ' s.fk_user_creation, ';
-        $sql .= ' s.parent, ';     
-        $sql .= ' s.budget, ';     
+		$sql .= ' ps.fk_section_parente, ';     
+		$sql .= ' s.budget, ';     
 		$sql .= ' s.entity, ';
 		$sql .= ' p.rowid as planform_id ';
 		$sql .= ' FROM ' . $this->get_table().' as ps';
