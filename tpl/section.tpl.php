@@ -13,10 +13,6 @@
 		<td width="20%">[section.fk_usergroup_title; strconv=no;]</td>
 		<td>[section.fk_usergroup; strconv=no;]</td>
 	</tr>
-	<tr>
-		<td width="20%">[section.budget_title; strconv=no;]</td>
-		<td>[section.budget; strconv=no;]</td>
-	</tr>
 </table>
 
 <br />
