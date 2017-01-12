@@ -211,7 +211,6 @@ class TSection extends TObjetStd
 		$sql .= ' g.nom as group_name, ';
 		$sql .= ' s.fk_user_modification, ';
 		$sql .= ' s.fk_user_creation, ';
-		$sql .= ' s.budget, ';     //////////////////////////////////////////////////////////////////////////////////////////
 		$sql .= ' s.entity ';
 		$sql .= ' FROM ' . $this->get_table().' as s';
 		$sql .= ' INNER JOIN ' . MAIN_DB_PREFIX.'usergroup as g ON (s.fk_usergroup=g.rowid AND g.entity IN ('.getEntity('usergroup').'))';
@@ -235,7 +234,6 @@ class TSection extends TObjetStd
 				'title' => $langs->trans('Title'),
 				'group_name' => $langs->trans('Group'),
 				'fk_usergroup' => $langs->trans('Group'),
-				'budget' => $langs ->trans('Budget'), ///////////////////////////////////////////////////////////////////////
 		);
 		if ($mode == 'title') {
 			foreach ( $transarray as $key => $val ) {
@@ -359,7 +357,8 @@ class TSectionPlanFormation extends TObjetStd
 		global $langs;
 
 		parent::set_table(MAIN_DB_PREFIX . 'planform_planform_section');
-		parent::add_champs('fk_planform,fk_section', array('type'=>'integer','index'=>true));
+		parent::add_champs('fk_planform,fk_section,fk_section_parente', array('type'=>'integer','index'=>true));
+		parent::add_champs('budget', array('type'=>'float','index'=>true));
 
 		parent::_init_vars();
 		parent::start();
@@ -383,6 +382,8 @@ class TSectionPlanFormation extends TObjetStd
 		$sql .= ' g.nom as group_name, ';
 		$sql .= ' s.fk_user_modification, ';
 		$sql .= ' s.fk_user_creation, ';
+        $sql .= ' s.parent, ';     
+        $sql .= ' s.budget, ';     
 		$sql .= ' s.entity, ';
 		$sql .= ' p.rowid as planform_id ';
 		$sql .= ' FROM ' . $this->get_table().' as ps';

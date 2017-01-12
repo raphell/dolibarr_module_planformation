@@ -228,7 +228,6 @@ function _card(TPDOdb &$PDOdb, TSection &$pfs, $mode = '') {
 	if ($mode == 'edit') {
 		$data['titre'] = load_fiche_titre($pfs->getId() > 0 ? $langs->trans("PFSectionEdit") : $langs->trans("PFSectionNew"), '');
 		$data['title'] = $formCore->texte('', 'title', $pfs->title, 30, 255);
-		$data['budget'] = $formCore->texte('', 'budget', $pfs->budget, 30, 255); /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////s
 		if ($conf->global->PF_SECTION_ADDON == 'mod_planformation_section_universal') {
 			$data['ref'] = $formCore->texte('', 'ref', $pfs->ref, 15, 255);
 		} elseif ($conf->global->PF_SECTION_ADDON == 'mod_planformation_section_simple') {
@@ -247,7 +246,6 @@ function _card(TPDOdb &$PDOdb, TSection &$pfs, $mode = '') {
 		$data['title'] = $pfs->title;
 		$data['ref'] = $formCore->texte('', 'ref', $pfs->ref, 15);
 		$data['fk_usergroup'] =  $usergroupsArray[$pfs->fk_usergroup];
-		$data['budget'] = $pfs->budget;   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		$buttons = $btRetour . ' ' . $btModifier . ' ' . $btDelete;
 	}
 
