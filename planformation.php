@@ -110,7 +110,8 @@ if (! empty($action)) {
 	if ($pf->load($PDOdb, GETPOST('id', 'int'))) {
 		_card($PDOdb, $pf, $typeFin, 'view');
 	} else {
-		setEventMessage($langs->trans('ImpossibleLoadElement'), 'errors');
+		//setEventMessage($langs->trans('ImpossibleLoadElement'), 'errors');
+		_list($PDOdb, $pf);
 	}
 } else {
 	_list($PDOdb, $pf);
