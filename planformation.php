@@ -380,7 +380,7 @@ function _listPlanFormSection(TPDOdb &$PDOdb, TPlanFormation &$pf, TTypeFinancem
 					'nbLine' => $conf->liste_limit
 			),
 			'link' => array (
-					'ref' => img_picto('', 'object_planformation@planformation') . ' <a href="?id=@ID@">@val@</a>'
+					'ref' => img_picto('', 'object_planformation@planformation') . ' <a href="section.php?id=@ID@">@val@</a>'
 			),
 			'hide' => array (
 					'ID',
