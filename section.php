@@ -260,7 +260,8 @@ function _card(TPDOdb &$PDOdb, TSection &$pfs, $mode = '') {
 	} else {
 		$data['titre'] = load_fiche_titre($langs->trans("PFSectionCard"), '');
 		$data['title'] = $pfs->title;
-		$dataPfs['budget'] = $planformSection->budget;
+		// Ligne ci-dessous à changer : N'affiche pas correctement le budget d'une section pour un plan de formation
+                $dataPfs['budget'] = $planformSection->budget;
 		$data['ref'] = $formCore->texte('', 'ref', $pfs->ref, 15);
 		$data['fk_usergroup'] =  $usergroupsArray[$pfs->fk_usergroup];
 		$buttons = $btRetour . ' ' . $btModifier . ' ' . $btDelete;

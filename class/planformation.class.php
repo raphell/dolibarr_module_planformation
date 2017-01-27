@@ -199,7 +199,7 @@ class TSection extends TObjetStd
 	function save(&$PDOdb, $saveBudget = false) {
 		if($saveBudget === true) {
 			$planSection = new TSectionPlanFormation();
-			$planSection->loadBy($PDOdb, array('fk_planform' => $_REQUEST['plan_id'], 'fk_section' => $_REQUEST['id']));
+                        $planSection->loadBy($PDOdb, array('fk_planform', 'fk_section'), array($_REQUEST['plan_id'], $_REQUEST['id']));;
 		}
 		parent::save($PDOdb);
 	}
@@ -371,7 +371,10 @@ class TSectionPlanFormation extends TObjetStd
 		parent::start();
 	}
 	
-	function loadBy(&$db, $TParam, $annexe=false) {
+	function loadBy(&$db, $Tvalue, $Tfield, $annexe=false) {
+                for ($i = 0 ; $i < count($Tfield) ; $i++)
+                    $TParam = array($Tfield[$i] => $Tvalue[$i], $Tfield[$i] => $Tvalue[$i]);
+                
 		$sql = "SELECT ".OBJETSTD_MASTERKEY." FROM ".$this->get_table()." WHERE 1=1";
 		
 		foreach($TParam as $key => $value) {
@@ -381,7 +384,7 @@ class TSectionPlanFormation extends TObjetStd
 		$sql .= ' LIMIT 1';
 	  	$db->Execute($sql);
 		if($db->Get_line()) {
-			return $this->load($db, $db->Get_field(OBJETSTD_MASTERKEY), $annexe);
+                    return $this->load($db, $db->Get_field(OBJETSTD_MASTERKEY), $annexe);
 		}
 		else {
 			return false;
