@@ -13,6 +13,16 @@
 		<td width="20%">[section.fk_usergroup_title; strconv=no;]</td>
 		<td>[section.fk_usergroup; strconv=no;]</td>
 	</tr>
+    <?php
+    if(isset($_GET[plan_section]))
+    {
+    echo"     
+        <tr>
+            <td width="20%">[section.fk_usergroup_title; strconv=no;]</td>
+            <td>[section.fk_usergroup; strconv=no;]</td>
+        </tr>";
+    }
+    ?>
 </table>
 
 <br />
