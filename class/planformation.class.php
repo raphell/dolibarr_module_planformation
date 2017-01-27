@@ -191,10 +191,17 @@ class TSection extends TObjetStd
 		parent::add_champs('title,ref', array('type'=>'string','index'=>true));
 		parent::add_champs('fk_usergroup', array('type'=>'integer','index'=>true));
 		parent::add_champs('fk_user_modification,fk_user_creation,entity', array('type'=>'integer','index'=>true));
-		parent::add_champs('budget' , array('type' =>'float', 'index'=>true));
 		parent::_init_vars();
 		parent::start();
 
+	}
+	
+	function save(&$PDOdb, $saveBudget = false) {
+		if($saveBudget === true) {
+			$planSection = new TSectionPlanFormation();
+			$planSection->loadBy($PDOdb, array('fk_planform' => $_REQUEST['plan_id'], 'fk_section' => $_REQUEST['id']));
+		}
+		parent::save($PDOdb);
 	}
 
 	/**
@@ -363,6 +370,23 @@ class TSectionPlanFormation extends TObjetStd
 		parent::_init_vars();
 		parent::start();
 	}
+	
+	function loadBy(&$db, $TParam, $annexe=false) {
+		$sql = "SELECT ".OBJETSTD_MASTERKEY." FROM ".$this->get_table()." WHERE 1=1";
+		
+		foreach($TParam as $key => $value) {
+			$sql .= " AND $key=$value";
+		}
+		
+		$sql .= ' LIMIT 1';
+	  	$db->Execute($sql);
+		if($db->Get_line()) {
+			return $this->load($db, $db->Get_field(OBJETSTD_MASTERKEY), $annexe);
+		}
+		else {
+			return false;
+		}
+	}
 
 	/**
 	 *
@@ -383,7 +407,7 @@ class TSectionPlanFormation extends TObjetStd
 		$sql .= ' s.fk_user_modification, ';
 		$sql .= ' s.fk_user_creation, ';
 		$sql .= ' ps.fk_section_parente, ';     
-		$sql .= ' s.budget, ';     
+		$sql .= ' ps.budget, ';     
 		$sql .= ' s.entity, ';
 		$sql .= ' p.rowid as planform_id ';
 		$sql .= ' FROM ' . $this->get_table().' as ps';
@@ -423,5 +447,34 @@ class TSectionPlanFormation extends TObjetStd
 		}
 
 		return $sql;
+	}
+	
+	/**
+	 *
+	 * @param string $mode
+	 */
+	public function getTrans($mode = 'std') {
+		global $langs;
+		$langs->load('planformation@planformation');
+		$langs->load("users");
+
+		$transarray = array (
+				'rowid' => $langs->trans('Id'),
+				'date_cre' => $langs->trans('Date_cre'),
+				'date_maj' => $langs->trans('Date_maj'),
+				'fk_planform' => $langs->trans('Planform'),
+				'fk_section' => $langs->trans('Section'),
+				'fk_section_parente' => $langs->trans('Parent'),
+				'budget' => $langs->trans('Budget'),
+		);
+		if ($mode == 'title') {
+			foreach ( $transarray as $key => $val ) {
+				$trans_array_title[$key . '_title'] = $val;
+			}
+
+			$transarray = $trans_array_title;
+		}
+
+		return $transarray;
 	}
 }
