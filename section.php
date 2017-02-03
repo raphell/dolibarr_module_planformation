@@ -72,7 +72,7 @@ if (! empty($action)) {
 				$pfs->set_values($_REQUEST);
                                 
                                 
-				$pfs->save($PDOdb, !empty($_REQUEST['plan_id']) ? true : false);
+				$pfs->save($PDOdb, GETPOST('budget'));
 				_card($PDOdb, $pfs, 'view');
 
 			break;
@@ -234,15 +234,17 @@ function _card(TPDOdb &$PDOdb, TSection &$pfs, $mode = '') {
 	// Fill form with title and data
 	$data = $pfs->getTrans('title');
 	$planformSection = new TSectionPlanFormation();
-	$dataPfs = $planformSection->getTrans('title');
+        $planformSection->loadByCustom($PDOdb, array('fk_planform' => $_REQUEST['plan_id'], 'fk_section' => $_REQUEST['id']));
 	
-
+	
+        $data['budget_title'] = 'Budget';
+        $data['plan_id'] = GETPOST('plan_id', 'int');
 	if ($mode == 'edit') {
 		$data['titre'] = load_fiche_titre($pfs->getId() > 0 ? $langs->trans("PFSectionEdit") : $langs->trans("PFSectionNew"), '');
 		$data['title'] = $formCore->texte('', 'title', $pfs->title, 30, 255);
-		if(isset($_GET['plan_id'])) {
-			var_dump($_GET);
-			$dataPfs['budget'] = $formCore->texte('', 'budget', $planformSection->budget, 30, 255);
+                $data['budget'] = $formCore->texte('', 'budget', $planformSection->budget, 30, 255);
+                if(isset($_REQUEST['plan_id'])) {
+		
 		}
 		if ($conf->global->PF_SECTION_ADDON == 'mod_planformation_section_universal') {
 			$data['ref'] = $formCore->texte('', 'ref', $pfs->ref, 15, 255);
@@ -260,9 +262,8 @@ function _card(TPDOdb &$PDOdb, TSection &$pfs, $mode = '') {
 	} else {
 		$data['titre'] = load_fiche_titre($langs->trans("PFSectionCard"), '');
 		$data['title'] = $pfs->title;
-		// Ligne ci-dessous à changer : N'affiche pas correctement le budget d'une section pour un plan de formation
-                $dataPfs['budget'] = $planformSection->budget;
-		$data['ref'] = $formCore->texte('', 'ref', $pfs->ref, 15);
+                $data['budget'] = $planformSection->budget;
+                $data['ref'] = $formCore->texte('', 'ref', $pfs->ref, 15);
 		$data['fk_usergroup'] =  $usergroupsArray[$pfs->fk_usergroup];
 		$buttons = $btRetour . ' ' . $btModifier . ' ' . $btDelete;
 	}
@@ -272,7 +273,6 @@ function _card(TPDOdb &$PDOdb, TSection &$pfs, $mode = '') {
 
 	array (
 			'section' => $data,
-			'planform_section' => $dataPfs,
 			'view' => array (
 					'mode' => $mode
 			),

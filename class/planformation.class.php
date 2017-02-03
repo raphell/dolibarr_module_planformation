@@ -196,10 +196,12 @@ class TSection extends TObjetStd
 
 	}
 	
-	function save(&$PDOdb, $saveBudget = false) {
-		if($saveBudget === true) {
+	function save(&$PDOdb, $budget = '') {
+		if(!empty($budget)) {
 			$planSection = new TSectionPlanFormation();
-                        $planSection->loadBy($PDOdb, array('fk_planform', 'fk_section'), array($_REQUEST['plan_id'], $_REQUEST['id']));;
+                        $planSection->loadByCustom($PDOdb, array('fk_planform' => $_REQUEST['plan_id'], 'fk_section' => $_REQUEST['id']));
+                        $planSection->budget = $budget;
+                        $planSection->save($PDOdb);
 		}
 		parent::save($PDOdb);
 	}
@@ -371,10 +373,7 @@ class TSectionPlanFormation extends TObjetStd
 		parent::start();
 	}
 	
-	function loadBy(&$db, $Tvalue, $Tfield, $annexe=false) {
-                for ($i = 0 ; $i < count($Tfield) ; $i++)
-                    $TParam = array($Tfield[$i] => $Tvalue[$i], $Tfield[$i] => $Tvalue[$i]);
-                
+	function loadByCustom(&$db, $TParam, $annexe=false) {                
 		$sql = "SELECT ".OBJETSTD_MASTERKEY." FROM ".$this->get_table()." WHERE 1=1";
 		
 		foreach($TParam as $key => $value) {
