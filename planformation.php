@@ -243,6 +243,7 @@ function _card(TPDOdb &$PDOdb, TPlanFormation &$pf, TTypeFinancement &$typeFin, 
 	echo $formCore->hidden('id', $pf->getId());
 	echo $formCore->hidden('action', 'save');
 	echo $formCore->hidden('entity', getEntity());
+        
 	if ($pf->getId() <= 0) {
 		echo $formCore->hidden('fk_user_creation', $user->id);
 	} else {
@@ -289,6 +290,7 @@ function _card(TPDOdb &$PDOdb, TPlanFormation &$pf, TTypeFinancement &$typeFin, 
 
 		$buttons = $btCancel . $btSave;
 	} else {
+                //var_dump($_REQUEST);
 		$data['titre'] = load_fiche_titre($langs->trans("PFPlanFormationCard"), '');
 		$data['type_fin_label'] = $typeFin->lines[$pf->fk_type_financement];
 		$data['date_start'] = dol_print_date($pf->date_start);
@@ -381,7 +383,7 @@ function _listPlanFormSection(TPDOdb &$PDOdb, TPlanFormation &$pf, TTypeFinancem
 					'nbLine' => $conf->liste_limit
 			),
 			'link' => array (
-					'ref' => img_picto('', 'object_planformation@planformation') . " <a href='section.php?id=@ID@&plan_id=$pf->rowid'>@val@</a>"
+					'ref' => img_picto('', 'object_planformation@planformation') . " <a href='section.php?id=@section_id@&plan_id=$pf->rowid'>@val@</a>"
 			),
 			'hide' => array (
 					'ID',
