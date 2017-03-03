@@ -96,11 +96,11 @@ if (! empty($action)) {
 
 			break;
                 case 'addsection' :
-                        if ($pfs->load($PDOdb, GETPOST('fk_section', 'int'))) {
+                        if ($pfs->load($PDOdb, GETPOST('fk_section_parente', 'int'))) {
 				$pfs_link = new TSectionPlanFormation();
                                 $pfs_link->fk_planform = $_REQUEST['plan_id'];
                                 $pfs_link->fk_section = GETPOST('fk_section', 'int');
-                                $pfs_link->fk_section_parente = GETPOST('id', 'int');
+                                $pfs_link->fk_section_parente = GETPOST('fk_section_parente', 'int');
                                 
                                 $pfs_link->save($PDOdb);
                                 _card($PDOdb, $pfs, 'view');
@@ -257,11 +257,16 @@ function _card(TPDOdb &$PDOdb, TSection &$pfs, $mode = '') {
 	
 	
         $data['budget_title'] = 'Budget';
+        $data['fk_section_parente_title'] = 'Section Parente';
         $data['plan_id'] = GETPOST('plan_id', 'int');
+		
 	if ($mode == 'edit') {
 		$data['titre'] = load_fiche_titre($pfs->getId() > 0 ? $langs->trans("PFSectionEdit") : $langs->trans("PFSectionNew"), '');
 		$data['title'] = $formCore->texte('', 'title', $pfs->title, 30, 255);
                 $data['budget'] = $formCore->texte('', 'budget', $planformSection->budget, 30, 255);
+                
+                $availableSection = TSection::getAvailableParentSection($PDOdb, GETPOST('plan_id', 'int'), $pfs->id);
+                $data['fk_section_parente'] = $formCore->combo($langs->trans('Select Section To Add'), 'fk_section', $availableSection, '');
                 
 		if ($conf->global->PF_SECTION_ADDON == 'mod_planformation_section_universal') {
 			$data['ref'] = $formCore->texte('', 'ref', $pfs->ref, 15, 255);
@@ -283,6 +288,10 @@ function _card(TPDOdb &$PDOdb, TSection &$pfs, $mode = '') {
                 $data['ref'] = $formCore->texte('', 'ref', $pfs->ref, 15);
 		$data['fk_usergroup'] =  $usergroupsArray[$pfs->fk_usergroup];
 		$buttons = $btRetour . ' ' . $btModifier . ' ' . $btDelete;
+                $sectionParente = new TSection();
+                $sectionParente->load($PDOdb, $planformSection->fk_section_parente);
+                
+                $data['fk_section_parente'] = $sectionParente->title;
 	}
 	// Todo mandatory fields
 
@@ -299,20 +308,4 @@ function _card(TPDOdb &$PDOdb, TSection &$pfs, $mode = '') {
 	));
 
 	echo $formCore->end_form();
-        
-        if ($mode == 'view') {
-
-		// Combo box to add section on an other section
-		$formCore = new TFormCore($_SERVER['PHP_SELF'], 'formaddSection', 'POST');
-		echo $formCore->hidden('action', 'addsection');
-		echo $formCore->hidden('id', $pfs->getId());
-                echo $formCore->hidden('plan_id', GETPOST('plan_id', 'int'));
-		$pfsBis = new TSection();
-		$availableSection = $pfsBis->getAvailableSection($PDOdb, $pfs->getId());
-		echo $formCore->combo($langs->trans('Select Section To Add'), 'fk_section', $availableSection, '');
-		echo $formCore->btsubmit($langs->trans('Add'), 'addsection');
-		$formCore->end();
-
-		
-	}
 }

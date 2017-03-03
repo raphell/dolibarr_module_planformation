@@ -355,6 +355,48 @@ class TSection extends TObjetStd
 		return $availableSection;
 
 	}
+        
+        public static function getAvailableParentSection(TPDOdb &$PDOdb, $planform_id, $section_id) {
+            // Récupération de toutes les sections du plan de formation
+            $sql = 'SELECT fk_section 
+                    FROM '.MAIN_DB_PREFIX.'planform_planform_section
+                    WHERE fk_planform='.$planform_id;
+            $result = $PDOdb->Execute($sql);
+            $TSections = array();
+            if ($result !== false) {
+                while ( $PDOdb->Get_line() ) {
+                    $TSections[] = $PDOdb->Get_field('fk_section');
+                }
+            }
+            
+            
+            //Identifier celles qui ne sont pas disponibles (enfantes)
+            $TSectionEnfantes = array();            
+            self::getSectionsFilles($TSectionEnfantes, $planform_id, $section_id);
+            var_dump($TSectionEnfantes);
+            // Différence entre les deux tableaux (TSections et TSectionEnfantes)
+            
+        }
+        
+        public static function getSectionsFilles(&$TSectionEnfantes, $planform_id, $section_id) {
+            
+            $PDOdb = new TPDOdb;
+            
+            $sql = 'SELECT fk_section 
+                    FROM '.MAIN_DB_PREFIX.'planform_planform_section
+                    WHERE fk_section_parente='.$section_id
+                    .' AND fk_planform='.$planform_id;
+            $result = $PDOdb->Execute($sql);
+            if ($result !== false) {
+                while ( $PDOdb->Get_line() ) {
+                    $fkSectionFille=$PDOdb->Get_field('fk_section');
+                    $TSectionEnfantes[] = $fkSectionFille;
+                    self::getSectionsFilles($TSectionEnfantes, $planform_id, $fkSectionFille);
+                }
+            }
+            
+            
+        }
 }
 
 /**
@@ -412,6 +454,7 @@ class TSectionPlanFormation extends TObjetStd
 		$sql .= ' ps.budget, ';     
 		$sql .= ' s.entity, ';
 		$sql .= ' p.rowid as planform_id ';
+		$sql .= ' "" as poubelle ';
 		$sql .= ' FROM ' . $this->get_table().' as ps';
 		$sql .= ' INNER JOIN '.$pf->get_table().' as p ON (p.rowid=ps.fk_planform)';
 		$sql .= ' INNER JOIN '.$sec->get_table().' as s ON (s.rowid=ps.fk_section)';
