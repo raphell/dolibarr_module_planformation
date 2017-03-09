@@ -196,13 +196,15 @@ class TSection extends TObjetStd
 
 	}
 	
-	function save(&$PDOdb, $budget = '') {
-		if(!empty($budget)) {
+	function save(&$PDOdb, $budget = '', $fk_section_parente='') {
+		if(!empty($budget)||!empty($fk_section_parente)) {
 			$planSection = new TSectionPlanFormation();
                         $planSection->loadByCustom($PDOdb, array('fk_planform' => $_REQUEST['plan_id'], 'fk_section' => $_REQUEST['id']));
                         $planSection->budget = $budget;
+                        $planSection->fk_section_parente =$fk_section_parente;
                         $planSection->save($PDOdb);
 		}
+                
 		parent::save($PDOdb);
 	}
 
@@ -243,6 +245,7 @@ class TSection extends TObjetStd
 				'title' => $langs->trans('Title'),
 				'group_name' => $langs->trans('Group'),
 				'fk_usergroup' => $langs->trans('Group'),
+                                'nom_section_parente' => $langs->trans('Parent'),
 		);
 		if ($mode == 'title') {
 			foreach ( $transarray as $key => $val ) {
@@ -380,24 +383,25 @@ class TSection extends TObjetStd
             
             $TAvailableParentSections = array();
             //return self::getSectionNameById($PDOdb, $TAvailableParentSections);
-            foreach($TAvailableParentSectionsId as $k => $id) {
-                $TAvailableParentSections[] = self::getSectionNameByIdBis($PDOdb, $id);
+            foreach($TAvailableParentSectionsId as $id) {
+                $TAvailableParentSections[$id] = self::getSectionNameById($PDOdb, $id);
             }
             return $TAvailableParentSections;
         }
         
-        private static function getSectionNameById(TPDOdb &$PDOdb, $TParam) {
+        /*private static function getSectionNameByIdbis(TPDOdb &$PDOdb, $TParam) {
             
             $TName = array();
-            foreach($TParam as $k => $id) {
+            foreach($TParam as $id) {
+                
                 $pfs = new TSection();
                 $pfs->load($PDOdb, $id);
                 $TName[] = $pfs->title;
             }
             return $TName;
-        }
+        }*/
         
-        private static function getSectionNameByIdBis(TPDOdb &$PDOdb, $section_id) {
+        private static function getSectionNameById(TPDOdb &$PDOdb, $section_id) {
             
             $pfs = new TSection();
             $pfs->load($PDOdb, $section_id);
@@ -420,6 +424,24 @@ class TSection extends TObjetStd
                     self::getSectionsFilles($TSectionEnfantes, $planform_id, $fkSectionFille);
                 }
             }
+        }
+        
+        public static function checkBudget(TPDOdb &$PDOdb,$planform_id,$section_id){
+            $sectionSoeurs = array();
+            self::getSectionsSoeurs($sectionSoeurs, $planform_id, $section_id);
+            $budgetSoeur = 0;
+            $pfs = new TSection();
+            $pfsParente = new TSection();
+            foreach($sectionSoeurs as $id)
+            {
+                $pfs->load($PDOdb, $id);
+                $budgetSoeur += $pfs->budget ;
+            }
+            $pfs->load($PDOdb, $section_id);
+            $pfsParente->load($PDOdb, $pfs->fk_section_parente) ;
+            $budgetParente = $pfsParente->budget;
+            
+            return $budgetSoeur <= $budgetParente;
         }
         
         public static function getSectionsSoeurs(&$TSectionSoeurs, $planform_id, $section_id) {
@@ -495,7 +517,8 @@ class TSectionPlanFormation extends TObjetStd
 		$sql .= ' g.nom as group_name, ';
 		$sql .= ' s.fk_user_modification, ';
 		$sql .= ' s.fk_user_creation, ';
-		$sql .= ' ps.fk_section_parente, ';     
+		//$sql .= ' ps.fk_section_parente, ';
+                $sql .= ' s2.title as nom_section_parente, ';
 		$sql .= ' ps.budget, ';     
 		$sql .= ' s.entity, ';
 		$sql .= ' p.rowid as planform_id, ';
@@ -503,6 +526,7 @@ class TSectionPlanFormation extends TObjetStd
 		$sql .= ' FROM ' . $this->get_table().' as ps';
 		$sql .= ' INNER JOIN '.$pf->get_table().' as p ON (p.rowid=ps.fk_planform)';
 		$sql .= ' INNER JOIN '.$sec->get_table().' as s ON (s.rowid=ps.fk_section)';
+                $sql .= ' INNER JOIN '.$sec->get_table().' as s2 ON (s2.rowid=ps.fk_section_parente)';
 		$sql .= ' INNER JOIN ' . MAIN_DB_PREFIX.'usergroup as g ON (s.fk_usergroup=g.rowid AND g.entity IN ('.getEntity('usergroup').'))';
 		$sql .= ' WHERE s.entity IN ('.getEntity(get_class($sec)).') AND p.entity IN ('.getEntity(get_class($pf)).')';
 
