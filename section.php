@@ -266,6 +266,7 @@ function _card(TPDOdb &$PDOdb, TSection &$pfs, $mode = '') {
                 $data['budget'] = $formCore->texte('', 'budget', $planformSection->budget, 30, 255);
                 
                 $availableSection = TSection::getAvailableParentSection($PDOdb, GETPOST('plan_id', 'int'), $pfs->id);
+                var_dump($availableSection);
                 $data['fk_section_parente'] = $formCore->combo($langs->trans('Select Section To Add'), 'fk_section', $availableSection, '');
                 
 		if ($conf->global->PF_SECTION_ADDON == 'mod_planformation_section_universal') {

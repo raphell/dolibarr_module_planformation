@@ -373,9 +373,35 @@ class TSection extends TObjetStd
             //Identifier celles qui ne sont pas disponibles (enfantes)
             $TSectionEnfantes = array();            
             self::getSectionsFilles($TSectionEnfantes, $planform_id, $section_id);
-            var_dump($TSectionEnfantes);
+            $TSectionEnfantes[] = $section_id;
+                        
             // Différence entre les deux tableaux (TSections et TSectionEnfantes)
+            $TAvailableParentSectionsId = array_diff($TSections, $TSectionEnfantes);
             
+            $TAvailableParentSections = array();
+            //return self::getSectionNameById($PDOdb, $TAvailableParentSections);
+            foreach($TAvailableParentSectionsId as $k => $id) {
+                $TAvailableParentSections[] = self::getSectionNameByIdBis($PDOdb, $id);
+            }
+            return $TAvailableParentSections;
+        }
+        
+        private static function getSectionNameById(TPDOdb &$PDOdb, $TParam) {
+            
+            $TName = array();
+            foreach($TParam as $k => $id) {
+                $pfs = new TSection();
+                $pfs->load($PDOdb, $id);
+                $TName[] = $pfs->title;
+            }
+            return $TName;
+        }
+        
+        private static function getSectionNameByIdBis(TPDOdb &$PDOdb, $section_id) {
+            
+            $pfs = new TSection();
+            $pfs->load($PDOdb, $section_id);
+            return $pfs->title;
         }
         
         public static function getSectionsFilles(&$TSectionEnfantes, $planform_id, $section_id) {
@@ -394,8 +420,27 @@ class TSection extends TObjetStd
                     self::getSectionsFilles($TSectionEnfantes, $planform_id, $fkSectionFille);
                 }
             }
+        }
+        
+        public static function getSectionsSoeurs(&$TSectionSoeurs, $planform_id, $section_id) {
             
+            $PDOdb = new TPDOdb;
             
+            $sec = new TSection();
+            $sec->load($PDOdb, $section_id);
+            $fkSectionParente = $sec->fk_section_parente;
+            
+            $sql = 'SELECT fk_section 
+                    FROM '.MAIN_DB_PREFIX.'planform_planform_section
+                    WHERE fk_section_parente='.$fkSectionParente
+                    .' AND fk_planform='.$planform_id;
+            $result = $PDOdb->Execute($sql);
+            if ($result !== false) {
+                while ( $PDOdb->Get_line() ) {
+                    $fkSectionSoeur=$PDOdb->Get_field('fk_section');
+                    $TSectionSoeurs[] = $fkSectionSoeur;
+                }
+            }
         }
 }
 
@@ -453,7 +498,7 @@ class TSectionPlanFormation extends TObjetStd
 		$sql .= ' ps.fk_section_parente, ';     
 		$sql .= ' ps.budget, ';     
 		$sql .= ' s.entity, ';
-		$sql .= ' p.rowid as planform_id ';
+		$sql .= ' p.rowid as planform_id, ';
 		$sql .= ' "" as poubelle ';
 		$sql .= ' FROM ' . $this->get_table().' as ps';
 		$sql .= ' INNER JOIN '.$pf->get_table().' as p ON (p.rowid=ps.fk_planform)';
