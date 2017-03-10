@@ -395,7 +395,7 @@ function _listPlanFormSection(TPDOdb &$PDOdb, TPlanFormation &$pf, TTypeFinancem
 					'nbLine' => $conf->liste_limit
 			),
 			'link' => array (
-					'ref' => "<a href='planformation.php?section_id=@section_id@&plan_id=$pf->rowid&action=delete_link'>" . img_picto('', 'delete') . "</a>" . img_picto('', 'object_planformation@planformation') . " <a href='section.php?id=@section_id@&plan_id=$pf->rowid'>@val@</a>"
+					'ref' => img_picto('', 'object_planformation@planformation') . " <a href='section.php?id=@section_id@&plan_id=$pf->rowid'>@val@</a>"
 			),
 			'hide' => array (
 					'ID',
@@ -425,6 +425,10 @@ function _listPlanFormSection(TPDOdb &$PDOdb, TPlanFormation &$pf, TTypeFinancem
 							'recherche' => $arrayUserGroups
 					)
 			),
-			'orderBy' => $TOrder
+			'orderBy' => $TOrder,
+                        'poubelle' => array (
+                                          'ref' => "<a href='planformation.php?section_id=@section_id@&plan_id=$pf->rowid&action=delete_link'>" . img_picto('', 'delete') . "</a>"
+                        )
+                
 	));
 }
